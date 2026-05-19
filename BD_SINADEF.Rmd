@@ -1,0 +1,43 @@
+---
+title: "Est2_Parcial_SINADEF"
+output: html_document
+date: "2026-05-19"
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Preprocesamiento
+```{r}
+rm(list = ls()) #Limpio
+setwd("~/Est2_Parcial/SINADEF")
+
+sinadefBD = read.csv("SINADEF_DATOS_ABIERTOS.csv")
+head(sinadefBD)
+```
+```{r}
+#Filtro datos para quedarme solo con 2019 y 2020
+sinadefBD = subset(sinadefBD, ANIO %in% c(2019, 2020, "2019", "2020"))
+
+str(sinadefBD)
+```
+Creando ratio 2019/2020 de muertes por provincia donde falleció la persona, a partir de los totales anuales por provincia
+```{r}
+#Creo una tabla de contingencia de Provincias vs Año
+tabla_provincias = table(sinadefBD$PROVINCIA_FALLECIMIENTO, sinadefBD$ANIO)
+
+#Convierto la tabla en un DF para manipularla
+df_provincias = data.frame(
+  Provincia = rownames(tabla_provincias),
+  Muertes_2019 = as.numeric(tabla_provincias[, "2019"]),
+  Muertes_2020 = as.numeric(tabla_provincias[, "2020"])
+)
+
+#Calculo el ratio 2019/2020
+df_provincias$Ratio_2020_2019 <- df_provincias$Muertes_2020 / df_provincias$Muertes_2019
+
+#Exporto la tabla
+archivo_salida = "c:/Users/adria/Documents/Est2_Parcial/SINADEF/BD_SINADEF.csv"
+write.csv(df_provincias, file = archivo_salida, row.names = F)
+```
+
